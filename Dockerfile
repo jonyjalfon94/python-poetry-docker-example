@@ -71,13 +71,13 @@ CMD ["tail", "-f", "/dev/null"]
 # 'test' stage runs our unit tests with pytest and
 # coverage.  Build will fail if test coverage is under 95%
 FROM development AS test
-RUN poetry run pytest ./tests > /app/result.txt
+RUN poetry run pytest ./tests --junitxml=/app/result.xml
 RUN poetry run coverage run --rcfile ./pyproject.toml -m pytest ./tests
 RUN poetry run coverage report -m > /app/coverage.txt
 
 FROM scratch AS test-results
-COPY --from=test /app/result.txt result.txt 
-COPY --from=test /app/coverage.txt coverage.txt 
+COPY --from=test /app/result.xml .
+COPY --from=test /app/coverage.txt .
 
 # 'production' stage uses the clean 'python-base' stage and copyies
 # in only our runtime deps that were installed in the 'builder-base'
