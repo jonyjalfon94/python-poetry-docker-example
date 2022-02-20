@@ -11,12 +11,13 @@ jobs:
     steps:
     # Download Source Code
     - uses: actions/checkout@v2
+      name: Get Sources
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         
 # Use the workflow template to build and push docker
     - uses: jonyjalfon94/workflow-templates/test-and-publish@main
-      name: CI
+      name: Test and Lint and Publish Results
       with:
         image_name: demo-app
         build_args: |
