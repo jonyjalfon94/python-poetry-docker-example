@@ -14,6 +14,11 @@ jobs:
     steps:
     - name: Test and Lint
       uses: jonyjalfon94/workflow-templates/test-and-lint@main
+   
+    - name: ERROR
+      shell: bash
+      run: |-
+        exit 1
       
 
   publish-test-results:
