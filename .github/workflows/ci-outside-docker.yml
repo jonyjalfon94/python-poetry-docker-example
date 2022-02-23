@@ -51,11 +51,6 @@ jobs:
         source .venv/bin/activate
         pytest
         
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    steps: 
-    
     - uses: jonyjalfon94/workflow-templates/build-and-push-docker@main
       name: Build with Docker
       with:
