@@ -50,12 +50,14 @@ jobs:
       run: |
         source .venv/bin/activate
         pytest
-        
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - uses: actions/checkout@v2
     - uses: jonyjalfon94/workflow-templates/build-and-push-docker@main
       name: Build with Docker
       with:
-        lint: false
-        test: false
         registry_username: jonyjalfon94
         registry_password: ${{ secrets.DOCKERHUBPASSWORD }}
         image_name: demo-app
