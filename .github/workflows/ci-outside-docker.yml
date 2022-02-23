@@ -1,61 +1,65 @@
-name: CI
+name: Another CI
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-
-  test:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.9.6
 
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
+    # install packages via poetry and cache result so future CI runs are fast
+    # the result is only cached if the build is successful
+    # https://stackoverflow.com/questions/62977821/how-to-cache-poetry-install-for-github-actions
+    - name: Install poetry
+      uses: snok/install-poetry@v1.2.0
+      with:
+        version: 1.1.8
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v2
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+    - name: Install dependencies
+      run: poetry install
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-      - name: Install Poetry
-        uses: dschep/install-poetry-action@v1.2
+#     - name: Linting
+#       run: |
+#         source .venv/bin/activate
+#         pylint **/*.py
 
-      - name: Cache Poetry virtualenv
-        uses: actions/cache@v1
-        id: cache
-        with:
-          path: ~/.virtualenvs
-          key: poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            poetry-${{ hashFiles('**/poetry.lock') }}
+    - name: Code Formatting
+      run: |
+        # it's unclear to me if `set` is required to ensure errors propagate, or if that's by default in some way
+        # the examples I found did not consistently set these options or indicate that it wasn't required
+        set -eax
+        source .venv/bin/activate
+        black --version
+        black --check .
+        isort **/*.py -c -v
 
-      - name: Set Poetry config
-        run: |
-          poetry config settings.virtualenvs.in-project false
-          poetry config settings.virtualenvs.path ~/.virtualenvs
-
-      - name: Install Dependencies
-        run: poetry install
-        if: steps.cache.outputs.cache-hit != 'true'
-
-      - name: Code Quality
-        run: poetry run black . --check
-
-      - name: Test with pytest
-        env:
-          DJANGO_SETTINGS_MODULE: project.settings
-          SECRETS_FILE: .confidential/ci.json
-        run: poetry run pytest --cov . -n 2
-# Use the workflow template to build and push docker
-      - uses: jonyjalfon94/workflow-templates/build-and-push-docker@main
-        name: CI
-        with:
-          lint: false
-          test: false
-          registry_username: jonyjalfon94
-          registry_password: ${{ secrets.DOCKERHUBPASSWORD }}
-          image_name: demo-app
-          tag: ${{ github.run_number }}
-          build_args: |
-            FIRST_ARG="Hello"
-            SECOND_ARG="World"
+#     - name: Setup node.js (for pyright)
+#       uses: actions/setup-node@v2.4.0
+#       with:
+#         node-version: "12"
+#     - name: Run type checking
+#       run: |
+#         npm install -g pyright
+#         source .venv/bin/activate
+#         pyright .
+    - name: Run Tests
+      run: |
+        source .venv/bin/activate
+        pytest
