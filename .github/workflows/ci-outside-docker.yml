@@ -32,24 +32,46 @@ jobs:
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+        
     - name: Install dependencies
       run: poetry install
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
     - name: Code Formatting
       run: |
-        # it's unclear to me if `set` is required to ensure errors propagate, or if that's by default in some way
-        # the examples I found did not consistently set these options or indicate that it wasn't required
-        set -eax
-        source .venv/bin/activate
-        black --version
-        black --check .
-        isort **/*.py -c -v
+        poetry run black --config ./pyproject.toml --check app tests
+
+    - name: Create results directory
+      run: |-
+        mkdir results
 
     - name: Run Tests
       run: |
-        source .venv/bin/activate
-        pytest
+        poetry run pytest ./tests --junitxml=./results/result.xml
+        poetry run coverage run --rcfile ./pyproject.toml -m pytest ./tests
+        poetry run coverage report -m > ./results/coverage.txt
+        
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-report
+        path: results
+        
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: code-coverage-report
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        with:
+          files: code-coverage-report/**/*.xml
+          
   build:
     runs-on: ubuntu-latest
     needs: test
