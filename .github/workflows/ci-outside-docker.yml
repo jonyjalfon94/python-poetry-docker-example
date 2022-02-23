@@ -26,6 +26,7 @@ jobs:
         uses: jonyjalfon94/workflow-templates/publish-test-results@main
           
   build:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     name: Docker Build and Push
     runs-on: ubuntu-latest
     needs: test
