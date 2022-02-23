@@ -8,7 +8,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -51,8 +51,13 @@ jobs:
         source .venv/bin/activate
         pytest
         
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps: 
+    
     - uses: jonyjalfon94/workflow-templates/build-and-push-docker@main
-      name: CI
+      name: Build with Docker
       with:
         lint: false
         test: false
