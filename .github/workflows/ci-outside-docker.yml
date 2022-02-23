@@ -25,6 +25,7 @@ jobs:
         version: 1.1.8
         virtualenvs-create: true
         virtualenvs-in-project: true
+        
     - name: Load cached venv
       id: cached-poetry-dependencies
       uses: actions/cache@v2
@@ -34,11 +35,6 @@ jobs:
     - name: Install dependencies
       run: poetry install
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-
-#     - name: Linting
-#       run: |
-#         source .venv/bin/activate
-#         pylint **/*.py
 
     - name: Code Formatting
       run: |
@@ -50,16 +46,20 @@ jobs:
         black --check .
         isort **/*.py -c -v
 
-#     - name: Setup node.js (for pyright)
-#       uses: actions/setup-node@v2.4.0
-#       with:
-#         node-version: "12"
-#     - name: Run type checking
-#       run: |
-#         npm install -g pyright
-#         source .venv/bin/activate
-#         pyright .
     - name: Run Tests
       run: |
         source .venv/bin/activate
         pytest
+        
+    - uses: jonyjalfon94/workflow-templates/build-and-push-docker@main
+      name: CI
+      with:
+        lint: false
+        test: false
+        registry_username: jonyjalfon94
+        registry_password: ${{ secrets.DOCKERHUBPASSWORD }}
+        image_name: demo-app
+        tag: latest
+        build_args: |
+          FIRST_ARG="Hello"
+          SECOND_ARG="World"
