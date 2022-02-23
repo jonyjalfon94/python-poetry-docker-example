@@ -57,8 +57,8 @@ jobs:
           channel-id: 'general'
           # For posting a simple plain text message
           slack-message: |-
-             GitHub build result: ${{ job.status  }}\n
-             Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n
-             Commit: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}\n
+             GitHub build result: ${{ job.status  }}
+             Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+             Commit: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
