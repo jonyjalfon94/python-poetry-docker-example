@@ -1,6 +1,6 @@
 [![Another CI](https://github.com/jonyjalfon94/python-poetry-docker-example/actions/workflows/ci-outside-docker.yml/badge.svg)](https://github.com/jonyjalfon94/python-poetry-docker-example/actions/workflows/ci-outside-docker.yml)
 
-# Poetry managed Python FastAPI application with Docker multi-stage builds!!
+# Poetry managed Python FastAPI application with Docker multi-stage builds!! :)
 
 ### This repo serves as a minimal reference on setting up docker multi-stage builds with poetry
 
