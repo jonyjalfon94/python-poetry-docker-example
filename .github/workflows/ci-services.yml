@@ -18,10 +18,8 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: jonyjalfon94/.github
-        token: ${{ secrets.TOKEN }}
-        # Select revision
-        ref: main
         # Personal access token to check out private repository
+        token: ${{ secrets.TOKEN }}
         path: .github
 
     - name: Test and Lint
