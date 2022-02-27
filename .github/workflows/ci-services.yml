@@ -1,0 +1,43 @@
+name: Another CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Test and Lint
+      uses: jonyjalfon94/.github/actions/test-and-lint@main
+
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Publish Test Results
+        uses: jonyjalfon94/.github/actions/publish-test-results@main
+          
+  build:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    name: Docker Build and Push
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - uses: jonyjalfon94/.github/actions/build-and-push-docker@main
+      name: Build and Push Docker Image
+      with:
+        registry_username: jonyjalfon94
+        registry_password: ${{ secrets.DOCKERHUBPASSWORD }}
+        image_name: demo-app
+        tag: latest
+        build_args: |
+          FIRST_ARG="Hello"
+          SECOND_ARG="World"
