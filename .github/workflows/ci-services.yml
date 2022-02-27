@@ -31,6 +31,15 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+
+      - name: Get composite run steps repository
+        uses: actions/checkout@v2
+        with:
+          repository: jonyjalfon94/.github
+          # Personal access token to check out private repository
+          token: ${{ secrets.TOKEN }}
+          path: .github
+
       - name: Publish Test Results
         uses: jonyjalfon94/.github/actions/publish-test-results@main
           
@@ -40,6 +49,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+
+    - name: Get composite run steps repository
+      uses: actions/checkout@v2
+      with:
+        repository: jonyjalfon94/.github
+        # Personal access token to check out private repository
+        token: ${{ secrets.TOKEN }}
+        path: .github
+        
     - uses: jonyjalfon94/.github/actions/build-and-push-docker@main
       name: Build and Push Docker Image
       with:
