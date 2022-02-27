@@ -41,7 +41,7 @@ jobs:
           path: .github
 
       - name: Publish Test Results
-        uses: jonyjalfon94/.github/actions/publish-test-results@main
+        uses: ./.github/actions/publish-test-results@main
           
   build:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -57,8 +57,8 @@ jobs:
         # Personal access token to check out private repository
         token: ${{ secrets.TOKEN }}
         path: .github
-        
-    - uses: jonyjalfon94/.github/actions/build-and-push-docker@main
+
+    - uses: ./.github/actions/build-and-push-docker@main
       name: Build and Push Docker Image
       with:
         registry_username: jonyjalfon94
