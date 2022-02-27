@@ -13,8 +13,18 @@ jobs:
     name: Lint and Test
     runs-on: ubuntu-latest
     steps:
+    
+    - name: Get composite run steps repository
+      uses: actions/checkout@v2
+      with:
+        repository: jonyjalfon94/.github
+        # Select revision
+        ref: main
+        # Personal access token to check out private repository
+        path: .github
+
     - name: Test and Lint
-      uses: jonyjalfon94/.github/actions/test-and-lint@main
+      uses: ./.github/actions/test-and-lint
 
   publish-test-results:
     name: "Publish Unit Tests Results"
