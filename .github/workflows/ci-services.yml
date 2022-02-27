@@ -44,7 +44,7 @@ jobs:
         uses: ./.github/actions/publish-test-results
           
   build:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     name: Docker Build and Push
     runs-on: ubuntu-latest
     needs: test
